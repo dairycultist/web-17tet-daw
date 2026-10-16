@@ -7,12 +7,17 @@
 
 		let render;
 		let t = 0;
-		let degree = 17*8;
+
 		let beats_per_bar = 16;
+		let bpm = 120;
+
 		let cursor = -1;
+		let cursor_move_t = 0;
 
 		const notes = [
-			{ beat: 0, degree: 10, length: 3 }
+			{ beat: 0, degree: 0, length: 3 },
+			{ beat: 1, degree: 6, length: 2 },
+			{ beat: 2, degree: 10, length: 1 }
 		];
 
 		function start() {
@@ -45,11 +50,31 @@
 
 				const output = event.outputBuffer.getChannelData(0);
 
+				const relevant_notes = [];
+				
+				for (const note of notes) {
+
+					if (note.beat <= cursor && note.beat + note.length > cursor)
+						relevant_notes.push(note);
+				}
+
 				for (let i = 0; i < output.length; i++) {
 
-					output[i] = Math.sin(Math.pow(2.0, degree / 17.0) * 2.0 * Math.PI * (t + i) / audioContext.sampleRate);
+					output[i] = 0;
+					
+					for (const note of relevant_notes)
+						output[i] += Math.sin(Math.pow(2.0, (note.degree + 8 * 17) / 17.0) * 2.0 * Math.PI * (t + i) / audioContext.sampleRate) * 0.3;
 				}
+
 				t += output.length;
+				cursor_move_t -= output.length;
+
+				if (cursor_move_t <= 0) {
+					
+					cursor_move_t = audioContext.sampleRate * 60 / bpm;
+					cursor = (cursor + 1) % beats_per_bar;
+					rerender();
+				}
 			};
 		}
 
