@@ -9,10 +9,13 @@
 		let t = 0;
 
 		let beats_per_bar = 16;
-		let bpm = 120;
+		let bpm = 240;
 
 		let cursor = -1;
 		let cursor_move_t = 0;
+
+		let just_placed_t = 0;
+		let just_placed_note;
 
 		const notes = [
 			{ beat: 0, degree: 0, length: 2 }
@@ -35,9 +38,17 @@
 				const note = pos_to_note(x, y);
 
 				if (note.length == 0) {
+
+					// add note
 					note.length = 1;
 					notes.push(note);
+
+					just_placed_t = 3000;
+					just_placed_note = note;
+
 				} else {
+
+					// remove note
 					notes.splice(notes.indexOf(note), 1);
 				}
 
@@ -61,6 +72,11 @@
 						relevant_notes.push(note);
 				}
 
+				if (just_placed_t > 0) {
+					
+					relevant_notes.push(just_placed_note);
+				}
+
 				for (let i = 0; i < output.length; i++) {
 
 					output[i] = 0;
@@ -71,6 +87,7 @@
 
 				t += output.length;
 				cursor_move_t -= output.length;
+				just_placed_t -= output.length;
 
 				if (cursor_move_t <= 0) {
 					
