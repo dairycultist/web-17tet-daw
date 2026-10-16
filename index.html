@@ -9,6 +9,11 @@
 		let t = 0;
 		let degree = 17*8;
 		let beats_per_bar = 16;
+		let cursor = -1;
+
+		const notes = [
+			{ beat: 0, degree: 10, length: 3 }
+		];
 
 		function start() {
 
@@ -24,9 +29,9 @@
 				const x = event.offsetX / canvas.offsetWidth * canvas.width;
 				const y = event.offsetY / canvas.offsetHeight * canvas.height;
 
-				const { beat, note } = pos_to_beatnote(x, y);
+				const { beat, degree } = pos_to_note(x, y);
 
-				alert("beat: " + beat + "\nnote: " + note);
+				alert("beat: " + beat + "\ndegree: " + degree);
 
 				rerender();
 			});
@@ -48,48 +53,67 @@
 			};
 		}
 
-		function beatnote_to_rect(beat, note) {
+		function note_to_rect(note) {
 
-			const this_x = Math.floor(beat * 300 / beats_per_bar) + 1;
-			const next_x = Math.floor((beat + 1) * 300 / beats_per_bar) + 1;
+			if (note.beat < 0 || note.beat >= beats_per_bar || note.degree < 0 || note.degree > 17 + 17)
+				return null;
+
+			const this_x = Math.floor(note.beat * 300 / beats_per_bar) + 1;
+			const next_x = Math.floor((note.beat + note.length) * 300 / beats_per_bar) + 1;
 
 			return {
 				x: this_x,
-				y: (17 + 17 - note) * 10 + 1,
+				y: (17 + 17 - note.degree) * 10 + 1,
 				w: next_x - this_x - 1,
 				h: 9
 			};
 		}
 
-		function pos_to_beatnote(x, y) {
+		function pos_to_note(x, y) {
+
+			if (x < 0 || x > 300 || y < 0 || y > 10 * (17 + 17 + 1) + 1)
+				return null;
 
 			return {
 				beat: Math.floor((x - 1) * beats_per_bar / 300),
-				note: Math.ceil((1 - y) / 10 + 17 + 17)
+				degree: Math.ceil((1 - y) / 10 + 17 + 17),
+				length: 1
 			};
 		}
 
 		function rerender() {
 
+			// render piano roll background
 			render.fillStyle = "grey";
 			render.fillRect(0, 0, 301, 10 * (17 + 17 + 1) + 1);
 
 			for (let beat = 0; beat < beats_per_bar; beat++) {
 
-				for (let note = 0; note < 17 + 17 + 1; note++) {
+				for (let degree = 0; degree < 17 + 17 + 1; degree++) {
 
-					if (note % 17 == 0) {
+					if (beat == cursor) {
+						render.fillStyle = "white";
+					} else if (degree % 17 == 0) {
 						render.fillStyle = "orange";
-					} else if (note % 17 == 10) {
+					} else if (degree % 17 == 10) {
 						render.fillStyle = "lightBlue";
 					} else {
 						render.fillStyle = "lightGrey";
 					}
 
-					const rect = beatnote_to_rect(beat, note);
+					const rect = note_to_rect({ beat, degree, length: 1 });
 
 					render.fillRect(rect.x, rect.y, rect.w, rect.h);
 				}
+			}
+
+			// render piano roll notes
+			render.fillStyle = "white";
+
+			for (const note of notes) {
+				
+				const rect = note_to_rect(note);
+				render.fillRect(rect.x, rect.y, rect.w, rect.h);
 			}
 		}
 	</script>
