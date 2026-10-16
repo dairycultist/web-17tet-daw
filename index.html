@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>17-TET DAW</title>
+	<script>
+
+		let t = 0;
+		let degree = 17*8;
+
+		function start() {
+
+			document.getElementById("start").style.display = "none";
+
+			// document.addEventListener("keydown", (event) => {});
+
+			const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+			const scriptProcessor = audioContext.createScriptProcessor(256, 1, 1); // generates audio data with 256 samples
+
+			scriptProcessor.connect(audioContext.destination); // connect to speaker
+
+			scriptProcessor.onaudioprocess = function (event) {
+
+				const output = event.outputBuffer.getChannelData(0);
+
+				for (let i = 0; i < output.length; i++) {
+
+					output[i] = Math.sin(Math.pow(2.0, degree / 17.0) * 2.0 * Math.PI * (t + i) / audioContext.sampleRate);
+				}
+				t += output.length;
+			};
+		}
+	</script>
+</head>
+<body>
+	hi
+	<button id="start" onclick="start();">start</button>
+</body>
+</html>
