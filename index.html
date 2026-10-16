@@ -5,26 +5,30 @@
 	<title>17-TET DAW</title>
 	<script>
 
+		let render;
 		let t = 0;
 		let degree = 17*8;
+		let beats_per_bar = 16;
 
 		function start() {
 
 			document.getElementById("start").style.display = "none";
 
 			const canvas = document.getElementById("canvas");
-			const render = canvas.getContext("2d");
+			render = canvas.getContext("2d");
 
-			render.moveTo(0, 0);
-			render.lineTo(200, 100);
-			render.stroke();
+			rerender();
 
 			canvas.addEventListener("click", (event) => {
 
 				const x = event.offsetX / canvas.offsetWidth * canvas.width;
 				const y = event.offsetY / canvas.offsetHeight * canvas.height;
 
-				alert(x + " " + y);
+				const { beat, note } = pos_to_beatnote(x, y);
+
+				alert("beat: " + beat + "\nnote: " + note);
+
+				rerender();
 			});
 
 			const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -43,10 +47,55 @@
 				t += output.length;
 			};
 		}
+
+		function beatnote_to_rect(beat, note) {
+
+			const this_x = Math.floor(beat * 300 / beats_per_bar) + 1;
+			const next_x = Math.floor((beat + 1) * 300 / beats_per_bar) + 1;
+
+			return {
+				x: this_x,
+				y: (17 + 17 - note) * 10 + 1,
+				w: next_x - this_x - 1,
+				h: 9
+			};
+		}
+
+		function pos_to_beatnote(x, y) {
+
+			return {
+				beat: Math.floor((x - 1) * beats_per_bar / 300),
+				note: Math.ceil((1 - y) / 10 + 17 + 17)
+			};
+		}
+
+		function rerender() {
+
+			render.fillStyle = "grey";
+			render.fillRect(0, 0, 301, 10 * (17 + 17 + 1) + 1);
+
+			for (let beat = 0; beat < beats_per_bar; beat++) {
+
+				for (let note = 0; note < 17 + 17 + 1; note++) {
+
+					if (note % 17 == 0) {
+						render.fillStyle = "orange";
+					} else if (note % 17 == 10) {
+						render.fillStyle = "lightBlue";
+					} else {
+						render.fillStyle = "lightGrey";
+					}
+
+					const rect = beatnote_to_rect(beat, note);
+
+					render.fillRect(rect.x, rect.y, rect.w, rect.h);
+				}
+			}
+		}
 	</script>
 </head>
 <body style="margin: 0;">
-	<canvas id="canvas" width="200" height="100" style="width: 100%; image-rendering: pixelated;"></canvas>
+	<canvas id="canvas" width="800" height="400" style="width: 100%; image-rendering: pixelated;"></canvas>
 	<button id="start" style="position: absolute; left: 50%; top: 50%; font-size: 50px; transform: translate(-50%, -50%); font-family: monospace;" onclick="start();">Start</button>
 </body>
 </html>
