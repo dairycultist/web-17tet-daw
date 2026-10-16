@@ -30,7 +30,7 @@
 
 			rerender();
 
-			canvas.addEventListener("click", (event) => {
+			canvas.addEventListener("mousedown", (event) => {
 
 				const x = event.offsetX / canvas.offsetWidth * canvas.width;
 				const y = event.offsetY / canvas.offsetHeight * canvas.height;
@@ -55,6 +55,27 @@
 				rerender();
 			});
 
+			canvas.addEventListener("mousemove", (event) => {
+
+				const x = event.offsetX / canvas.offsetWidth * canvas.width;
+				const y = event.offsetY / canvas.offsetHeight * canvas.height;
+
+				const note = pos_to_note(x, y, false);
+
+				const new_length = note.beat - just_placed_note.beat + 1;
+
+				if (new_length != just_placed_note.length && new_length >= 1) {
+
+					just_placed_note.length = new_length;
+					rerender();
+				}
+			});
+
+			canvas.addEventListener("mouseup", (event) => {
+
+				just_placed_note = null;
+			});
+
 			const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 			const scriptProcessor = audioContext.createScriptProcessor(256, 1, 1); // generates audio data with 256 samples
 
@@ -72,7 +93,7 @@
 						relevant_notes.push(note);
 				}
 
-				if (just_placed_t > 0) {
+				if (just_placed_t > 0 && just_placed_note) {
 					
 					relevant_notes.push(just_placed_note);
 				}
@@ -114,7 +135,7 @@
 			};
 		}
 
-		function pos_to_note(x, y) {
+		function pos_to_note(x, y, lookup_existing = true) {
 
 			if (x < 0 || x > 300 || y < 0 || y > 10 * (17 + 17 + 1) + 1)
 				return null;
@@ -123,10 +144,13 @@
 			const degree = Math.ceil((1 - y) / 10 + 17 + 17);
 
 			// return the existing note at that position, or create one if one doesn't exist
-			for (const note of notes) {
+			if (lookup_existing) {
 
-				if (note.degree == degree && note.beat <= beat && note.beat + note.length > beat)
-					return note;
+				for (const note of notes) {
+
+					if (note.degree == degree && note.beat <= beat && note.beat + note.length > beat)
+						return note;
+				}
 			}
 
 			// a length of zero means the note hasn't been inserted into the piano roll
