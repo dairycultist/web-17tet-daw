@@ -14,8 +14,8 @@
 		let cursor = -1;
 		let cursor_move_t = 0;
 
-		let just_placed_t = 0;
-		let just_placed_note;
+		let selected_t = 0; // for playing audio upon selecting
+		let selected_note;
 
 		const notes = [
 			{ beat: 0, degree: 0, length: 2 }
@@ -43,8 +43,8 @@
 					note.length = 1;
 					notes.push(note);
 
-					just_placed_t = 3000;
-					just_placed_note = note;
+					selected_t = 3000;
+					selected_note = note;
 
 				} else {
 
@@ -57,23 +57,40 @@
 
 			canvas.addEventListener("mousemove", (event) => {
 
+				if (!selected_note)
+					return;
+
 				const x = event.offsetX / canvas.offsetWidth * canvas.width;
 				const y = event.offsetY / canvas.offsetHeight * canvas.height;
 
 				const note = pos_to_note(x, y, false);
 
-				const new_length = note.beat - just_placed_note.beat + 1;
+				const new_length = note.beat - selected_note.beat + 1;
 
-				if (new_length != just_placed_note.length && new_length >= 1) {
+				if (new_length != selected_note.length && new_length >= 1) {
 
-					just_placed_note.length = new_length;
+					selected_note.length = new_length;
 					rerender();
 				}
 			});
 
 			canvas.addEventListener("mouseup", (event) => {
 
-				just_placed_note = null;
+				// check if the selected note is covering any other notes
+				for (const note of notes) {
+
+					if (note == selected_note)
+						continue;
+
+					if (note.degree == selected_note.degree && (
+						   (note.beat               >= selected_note.beat && note.beat               < selected_note.beat + selected_note.length)
+						|| (note.beat + note.length >= selected_note.beat && note.beat + note.length < selected_note.beat + selected_note.length)
+					))
+						notes.splice(notes.indexOf(note), 1);
+				}
+
+				selected_note = null;
+				rerender();
 			});
 
 			const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -93,9 +110,9 @@
 						relevant_notes.push(note);
 				}
 
-				if (just_placed_t > 0 && just_placed_note) {
+				if (selected_t > 0 && selected_note) {
 					
-					relevant_notes.push(just_placed_note);
+					relevant_notes.push(selected_note);
 				}
 
 				for (let i = 0; i < output.length; i++) {
@@ -108,7 +125,7 @@
 
 				t += output.length;
 				cursor_move_t -= output.length;
-				just_placed_t -= output.length;
+				selected_t -= output.length;
 
 				if (cursor_move_t <= 0) {
 					
@@ -182,9 +199,13 @@
 			}
 
 			// render piano roll notes
-			render.fillStyle = "White";
-
 			for (const note of notes) {
+
+				if (note == selected_note) {
+					render.fillStyle = "Yellow";
+				} else {
+					render.fillStyle = "White";
+				}
 				
 				const rect = note_to_rect(note);
 				render.fillRect(rect.x, rect.y, rect.w, rect.h);
