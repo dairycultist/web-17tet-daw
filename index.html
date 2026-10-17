@@ -35,8 +35,12 @@
 
 				if (event.key === ' ') {
 					playing = !playing;
-					cursor = -1;
-					cursor_move_t = 0;
+
+					if (!playing) {
+						cursor = -1;
+						cursor_move_t = 0;
+						rerender();
+					}
 				}
 			});
 
@@ -203,7 +207,7 @@
 		function rerender() {
 
 			// render piano roll background
-			render.fillStyle = "Grey";
+			render.fillStyle = "Black";
 			render.fillRect(0, 0, render.canvas.width, render.canvas.height);
 
 			for (let beat = 0; beat < beats_per_bar; beat++) {
@@ -211,11 +215,11 @@
 				for (let degree = 0; degree < 17 + 17 + 1; degree++) {
 
 					if (degree % 17 == 0) {
-						render.fillStyle = beat == cursor ? "NavajoWhite" : "Orange";
+						render.fillStyle = beat == cursor ? "#FFBB99" : "#BB7040";
 					} else if (degree % 17 == 10) {
-						render.fillStyle = beat == cursor ? "LightCyan" : "LightBlue";
+						render.fillStyle = beat == cursor ? "#AAAAFF" : "#5555AA";
 					} else {
-						render.fillStyle = beat == cursor ? "WhiteSmoke" : "LightGrey";
+						render.fillStyle = beat == cursor ? "#888888" : "#555555";
 					}
 
 					const rect = note_to_rect({ beat, degree, length: 1 });
@@ -247,12 +251,12 @@
 		}
 	</script>
 </head>
-<body style="margin: 0;">
+<body style="margin: 0; background: black; color: #eee; font-family: sans-serif; font-weight: 700; font-size: 18px;">
 	<button id="start" style="position: absolute; left: 50%; top: 50%; font-size: 50px; transform: translate(-50%, -50%); font-family: monospace;" onclick="start();">Start</button>
 
 	<div style="display: flex;">
 
-		<canvas id="canvas" width="301" height="351" style="height: 100vh;"></canvas>
+		<canvas id="canvas" width="601" height="701" style="height: 100vh;"></canvas>
 	
 		<div>
 			<label for="bpm">BPM:</label>
