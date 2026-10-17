@@ -11,6 +11,7 @@
 		let beats_per_bar = 16;
 		let bpm = 240;
 
+		let playing = false;
 		let cursor = -1;
 		let cursor_move_t = 0;
 
@@ -29,6 +30,15 @@
 			render = canvas.getContext("2d");
 
 			rerender();
+
+			document.addEventListener("keydown", (event) => {
+
+				if (event.key === ' ') {
+					playing = !playing;
+					cursor = -1;
+					cursor_move_t = 0;
+				}
+			});
 
 			canvas.addEventListener("mousedown", (event) => {
 
@@ -124,14 +134,18 @@
 				}
 
 				t += output.length;
-				cursor_move_t -= output.length;
 				selected_t -= output.length;
 
-				if (cursor_move_t <= 0) {
-					
-					cursor_move_t = audioContext.sampleRate * 60 / bpm;
-					cursor = (cursor + 1) % beats_per_bar;
-					rerender();
+				if (playing) {
+
+					cursor_move_t -= output.length;
+
+					if (cursor_move_t <= 0) {
+						
+						cursor_move_t = audioContext.sampleRate * 60 / bpm;
+						cursor = (cursor + 1) % beats_per_bar;
+						rerender();
+					}
 				}
 			};
 		}
