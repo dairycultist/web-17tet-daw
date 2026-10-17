@@ -47,19 +47,22 @@
 
 				const note = pos_to_note(x, y);
 
-				if (note.length == 0) {
+				if (note) {
 
-					// add note
-					note.length = 1;
-					notes.push(note);
+					if (note.length == 0) {
 
-					selected_t = 3000;
-					selected_note = note;
+						// add note
+						note.length = 1;
+						notes.push(note);
 
-				} else {
+						selected_t = 3000;
+						selected_note = note;
 
-					// remove note
-					notes.splice(notes.indexOf(note), 1);
+					} else {
+
+						// remove note
+						notes.splice(notes.indexOf(note), 1);
+					}
 				}
 
 				rerender();
@@ -75,6 +78,9 @@
 
 				const note = pos_to_note(x, y, false);
 
+				if (!note)
+					return;
+
 				const new_length = note.beat - selected_note.beat + 1;
 
 				if (new_length != selected_note.length && new_length >= 1) {
@@ -84,7 +90,10 @@
 				}
 			});
 
-			canvas.addEventListener("mouseup", (event) => {
+			document.addEventListener("mouseup", (event) => {
+
+				if (!selected_note)
+					return;
 
 				// check if the selected note is covering any other notes
 				for (const note of notes) {
@@ -228,10 +237,27 @@
 				render.fillRect(rect.x, rect.y, rect.w, rect.h);
 			}
 		}
+
+		function try_set_bpm(value) {
+
+			if (!isNaN(value) && value >= 1 && value <= 300)
+				bpm = Math.floor(value) * 4;
+
+			return "" + (bpm / 4);
+		}
 	</script>
 </head>
 <body style="margin: 0;">
-	<canvas id="canvas" width="301" height="351" style="height: 100vh; position: absolute;"></canvas>
 	<button id="start" style="position: absolute; left: 50%; top: 50%; font-size: 50px; transform: translate(-50%, -50%); font-family: monospace;" onclick="start();">Start</button>
+
+	<div style="display: flex;">
+
+		<canvas id="canvas" width="301" height="351" style="height: 100vh;"></canvas>
+	
+		<div>
+			<label for="bpm">BPM:</label>
+			<input type="text" name="bpm" onchange="value = try_set_bpm(value);" value="120">
+		</div>
+	</div>
 </body>
 </html>
