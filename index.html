@@ -8,6 +8,8 @@
 		let render;
 		let t = 0;
 
+		let base_octave = 7;
+
 		let beats_per_bar = 16;
 		let bpm = 240;
 
@@ -18,9 +20,7 @@
 		let selected_t = 0; // for playing audio upon selecting
 		let selected_note;
 
-		const notes = [
-			{ beat: 0, degree: 0, length: 2 }
-		];
+		const notes = [];
 
 		function start() {
 
@@ -93,8 +93,8 @@
 						continue;
 
 					if (note.degree == selected_note.degree && (
-						   (note.beat               >= selected_note.beat && note.beat               < selected_note.beat + selected_note.length)
-						|| (note.beat + note.length >= selected_note.beat && note.beat + note.length < selected_note.beat + selected_note.length)
+						   (note.beat                   >= selected_note.beat && note.beat                   < selected_note.beat + selected_note.length)
+						|| (note.beat + note.length - 1 >= selected_note.beat && note.beat + note.length - 1 < selected_note.beat + selected_note.length)
 					))
 						notes.splice(notes.indexOf(note), 1);
 				}
@@ -108,7 +108,7 @@
 
 			scriptProcessor.connect(audioContext.destination); // connect to speaker
 
-			scriptProcessor.onaudioprocess = function (event) {
+			scriptProcessor.onaudioprocess = (event) => {
 
 				const output = event.outputBuffer.getChannelData(0);
 
@@ -130,7 +130,7 @@
 					output[i] = 0;
 					
 					for (const note of relevant_notes)
-						output[i] += Math.sign(Math.sin(Math.pow(2.0, (note.degree + 8 * 17) / 17.0) * 2.0 * Math.PI * (t + i) / audioContext.sampleRate)) * 0.3;
+						output[i] += Math.sign(Math.sin(Math.pow(2.0, (note.degree + base_octave * 17) / 17.0) * 2.0 * Math.PI * (t + i) / audioContext.sampleRate)) * 0.3;
 				}
 
 				t += output.length;
@@ -155,24 +155,27 @@
 			if (note.beat < 0 || note.beat >= beats_per_bar || note.degree < 0 || note.degree > 17 + 17)
 				return null;
 
-			const this_x = Math.floor(note.beat * 300 / beats_per_bar) + 1;
-			const next_x = Math.floor((note.beat + note.length) * 300 / beats_per_bar) + 1;
+			const this_x = Math.floor( note.beat                * (render.canvas.width - 1) / beats_per_bar) + 1;
+			const next_x = Math.floor((note.beat + note.length) * (render.canvas.width - 1) / beats_per_bar) + 1;
+
+			const this_y = Math.floor((1 - (note.degree + 1) / 35) * (render.canvas.height - 1)) + 1;
+			const next_y = Math.floor((1 - (note.degree)     / 35) * (render.canvas.height - 1)) + 1;
 
 			return {
 				x: this_x,
-				y: (17 + 17 - note.degree) * 10 + 1,
+				y: this_y,
 				w: next_x - this_x - 1,
-				h: 9
+				h: next_y - this_y - 1
 			};
 		}
 
 		function pos_to_note(x, y, lookup_existing = true) {
 
-			if (x < 0 || x > 300 || y < 0 || y > 10 * (17 + 17 + 1) + 1)
+			if (x < 0 || x > render.canvas.width - 1 || y < 0 || y > render.canvas.height - 1)
 				return null;
 
-			const beat = Math.floor((x - 1) * beats_per_bar / 300);
-			const degree = Math.ceil((1 - y) / 10 + 17 + 17);
+			const beat = Math.floor((x - 1) * beats_per_bar / (render.canvas.width - 1));
+			const degree = Math.floor((1 - y / (render.canvas.height - 1)) * 35);
 
 			// return the existing note at that position, or create one if one doesn't exist
 			if (lookup_existing) {
@@ -192,7 +195,7 @@
 
 			// render piano roll background
 			render.fillStyle = "Grey";
-			render.fillRect(0, 0, 301, 10 * (17 + 17 + 1) + 1);
+			render.fillRect(0, 0, render.canvas.width, render.canvas.height);
 
 			for (let beat = 0; beat < beats_per_bar; beat++) {
 
@@ -228,7 +231,7 @@
 	</script>
 </head>
 <body style="margin: 0;">
-	<canvas id="canvas" width="800" height="400" style="width: 100%;"></canvas>
+	<canvas id="canvas" width="301" height="351" style="height: 100vh; position: absolute;"></canvas>
 	<button id="start" style="position: absolute; left: 50%; top: 50%; font-size: 50px; transform: translate(-50%, -50%); font-family: monospace;" onclick="start();">Start</button>
 </body>
 </html>
