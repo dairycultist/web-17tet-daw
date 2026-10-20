@@ -20,9 +20,8 @@
 		let selected_t = 0; // for playing audio upon selecting
 		let selected_note;
 
-		const tracks = [[], []];
+		const tracks = [[]];
 		let curr_track_i = 0;
-		// const notes = [];
 
 		function start() {
 
@@ -173,10 +172,12 @@
 						if (cursor >= beats_per_bar) {
 
 							cursor = 0;
-							curr_track_i = (curr_track_i + 1) % tracks.length;
-						}
 
-						rerender();
+							// update which track is selected (this automatically rerenders)
+							select_track((curr_track_i + 1) % tracks.length);
+						} else {
+							rerender();
+						}
 					}
 				}
 			};
@@ -238,7 +239,7 @@
 					} else if (degree % 17 == 10) {
 						render.fillStyle = beat == cursor ? "#AAAAFF" : "#5555AA";
 					} else {
-						render.fillStyle = beat == cursor ? "#888888" : "#555555";
+						render.fillStyle = beat == cursor ? "#888888" : Math.floor(beat / 4) % 2 == 0 ? "#555555" : "#444444";
 					}
 
 					const rect = note_to_rect({ beat, degree, length: 1 });
@@ -268,7 +269,41 @@
 
 			return "" + (bpm / 4);
 		}
+
+		function select_track(track_i) {
+
+			document.getElementById("track_" + curr_track_i).classList.remove("selected");
+			curr_track_i = track_i;
+			document.getElementById("track_" + curr_track_i).classList.add("selected");
+
+			rerender();
+		}
+
+		function add_track() {
+
+			tracks.push([]);
+			document.getElementById("tracks").innerHTML += `
+				<div id="track_${ tracks.length - 1 }" class="track">
+					<button type="button"><-</button>
+					${ tracks.length }
+					<button type="button">-></button>
+					<br>
+					<button type="button" onclick="select_track(${ tracks.length - 1 });">Select</button>
+				</div>
+			`;
+		}
 	</script>
+	<style>
+		.track {
+			background: grey;
+			color: black;
+			padding: 4px;
+		}
+
+		.track.selected {
+			background: lightgrey;
+		}
+	</style>
 </head>
 <body style="margin: 0; background: black; color: #eee; font-family: sans-serif; font-weight: 700; font-size: 18px;">
 	<button type="button" id="start" style="position: absolute; left: 50%; top: 50%; font-size: 50px; transform: translate(-50%, -50%); font-family: monospace;" onclick="start();">Start</button>
@@ -284,17 +319,16 @@
 			<br><br>
 
 			<div style="display: flex; gap: 1em;">
-				<div style="display: flex; gap: 1em;">
-					<div style="background: grey; color: black; padding: 4px;">
+				<div style="display: flex; gap: 1em;" id="tracks">
+					<div id="track_0" class="track selected">
 						<button type="button"><-</button>
 						1
 						<button type="button">-></button>
 						<br>
-						<button type="button">Edit</button>
-						<button type="button">Delete</button>
+						<button type="button" onclick="select_track(0);">Select</button>
 					</div>
 				</div>
-				<button type="button">Add</button>
+				<button type="button" onclick="add_track();">Add</button>
 			</div>
 		</div>
 	</div>
