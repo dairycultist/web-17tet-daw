@@ -142,8 +142,17 @@
 
 					output[i] = 0;
 					
-					for (const note of relevant_notes)
-						output[i] += Math.sign(Math.sin(Math.pow(2.0, (note.degree + base_octave * 17) / 17.0) * 2.0 * Math.PI * (t + i) / audioContext.sampleRate)) * 0.3;
+					for (const note of relevant_notes) {
+
+						const signal = Math.sign(Math.sin(Math.pow(2.0, (note.degree + base_octave * 17) / 17.0) * 2.0 * Math.PI * (t + i) / audioContext.sampleRate));
+						let amplitude = 0.3;
+
+						if (note.beat == cursor) {
+							amplitude += 0.3 * cursor_move_t / (audioContext.sampleRate * 60 / bpm);
+						}
+
+						output[i] += signal * amplitude;
+					}
 				}
 
 				t += output.length;
