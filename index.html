@@ -35,6 +35,9 @@
 			document.addEventListener("keydown", (event) => {
 
 				if (event.key === ' ') {
+
+					event.preventDefault();
+
 					playing = !playing;
 
 					if (!playing) {
@@ -292,6 +295,21 @@
 				</div>
 			`;
 		}
+
+		function delete_selected_track() {
+
+			if (tracks.length == 1) {
+
+				alert("Can't delete only track!");
+				return;
+			}
+
+			tracks.splice(curr_track_i, 1);
+
+			select_track(Math.min(curr_track_i, tracks.length - 1));
+
+			document.getElementById("track_" + tracks.length).remove();
+		}
 	</script>
 	<style>
 		.track {
@@ -330,6 +348,9 @@
 				</div>
 				<button type="button" onclick="add_track();">Add</button>
 			</div>
+
+			<br><br><br><br>
+			<button type="button" onclick="delete_selected_track();">Delete selected track</button>
 		</div>
 	</div>
 </body>
