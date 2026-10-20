@@ -287,9 +287,9 @@
 			tracks.push([]);
 			document.getElementById("tracks").innerHTML += `
 				<div id="track_${ tracks.length - 1 }" class="track">
-					<button type="button"><-</button>
+					<button type="button" onclick="swap_track_left(${ tracks.length - 1 });"><-</button>
 					${ tracks.length }
-					<button type="button">-></button>
+					<button type="button" onclick="swap_track_right(${ tracks.length - 1 });">-></button>
 					<br>
 					<button type="button" onclick="select_track(${ tracks.length - 1 });">Select</button>
 				</div>
@@ -309,6 +309,32 @@
 			select_track(Math.min(curr_track_i, tracks.length - 1));
 
 			document.getElementById("track_" + tracks.length).remove();
+		}
+
+		function swap_track_left(track_i) {
+
+			if (track_i <= 0) {
+
+				alert("Can't move any more left!");
+				return;
+			}
+
+			[tracks[track_i], tracks[track_i - 1]] = [tracks[track_i - 1], tracks[track_i]];
+
+			select_track(track_i - 1);
+		}
+
+		function swap_track_right(track_i) {
+
+			if (track_i >= tracks.length - 1) {
+
+				alert("Can't move any more right!");
+				return;
+			}
+
+			[tracks[track_i], tracks[track_i + 1]] = [tracks[track_i + 1], tracks[track_i]];
+
+			select_track(track_i + 1);
 		}
 	</script>
 	<style>
@@ -339,9 +365,9 @@
 			<div style="display: flex; gap: 1em;">
 				<div style="display: flex; gap: 1em;" id="tracks">
 					<div id="track_0" class="track selected">
-						<button type="button"><-</button>
+						<button type="button" onclick="swap_track_left(0);"><-</button>
 						1
-						<button type="button">-></button>
+						<button type="button" onclick="swap_track_right(0);">-></button>
 						<br>
 						<button type="button" onclick="select_track(0);">Select</button>
 					</div>
