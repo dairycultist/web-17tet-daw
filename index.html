@@ -27,6 +27,7 @@
 
 			document.getElementById("start").style.display = "none";
 			document.getElementById("content").style.display = "flex";
+			document.getElementById("bpm").value = bpm / 4;
 
 			const canvas = document.getElementById("canvas");
 			render = canvas.getContext("2d");
@@ -362,7 +363,7 @@
 	
 		<div>
 			<label for="bpm">BPM:</label>
-			<input type="text" name="bpm" onchange="value = try_set_bpm(value);" value="60">
+			<input type="text" name="bpm" id="bpm" onchange="value = try_set_bpm(value);" value="60">
 
 			<br><br>
 
