@@ -20,16 +20,19 @@
 		let selected_t = 0; // for playing audio upon selecting
 		let selected_note;
 
-		const tracks = [[]];
+		const tracks = [];
 		let curr_track_i = 0;
 
 		function start() {
 
 			document.getElementById("start").style.display = "none";
+			document.getElementById("content").style.display = "flex";
 
 			const canvas = document.getElementById("canvas");
 			render = canvas.getContext("2d");
 
+			add_track();
+			select_track(0);
 			rerender();
 
 			document.addEventListener("keydown", (event) => {
@@ -350,9 +353,10 @@
 	</style>
 </head>
 <body style="margin: 0; background: black; color: #eee; font-family: sans-serif; font-weight: 700; font-size: 18px;">
+
 	<button type="button" id="start" style="position: absolute; left: 50%; top: 50%; font-size: 50px; transform: translate(-50%, -50%); font-family: monospace;" onclick="start();">Start</button>
 
-	<div style="display: flex;">
+	<div style="display: none;" id="content">
 
 		<canvas id="canvas" width="601" height="701" style="height: 100vh;"></canvas>
 	
@@ -363,15 +367,7 @@
 			<br><br>
 
 			<div style="display: flex; gap: 1em;">
-				<div style="display: flex; gap: 1em;" id="tracks">
-					<div id="track_0" class="track selected">
-						<button type="button" onclick="swap_track_left(0);"><-</button>
-						1
-						<button type="button" onclick="swap_track_right(0);">-></button>
-						<br>
-						<button type="button" onclick="select_track(0);">Select</button>
-					</div>
-				</div>
+				<div style="display: flex; gap: 1em;" id="tracks"></div>
 				<button type="button" onclick="add_track();">Add</button>
 			</div>
 
@@ -379,5 +375,6 @@
 			<button type="button" onclick="delete_selected_track();">Delete selected track</button>
 		</div>
 	</div>
+
 </body>
 </html>
