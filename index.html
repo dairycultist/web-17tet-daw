@@ -20,7 +20,9 @@
 		let selected_t = 0; // for playing audio upon selecting
 		let selected_note;
 
-		const notes = [];
+		const tracks = [[], []];
+		let curr_track_i = 0;
+		// const notes = [];
 
 		function start() {
 
@@ -57,7 +59,7 @@
 
 						// add note
 						note.length = 1;
-						notes.push(note);
+						tracks[curr_track_i].push(note);
 
 						selected_t = 3000;
 						selected_note = note;
@@ -65,7 +67,7 @@
 					} else {
 
 						// remove note
-						notes.splice(notes.indexOf(note), 1);
+						tracks[curr_track_i].splice(tracks[curr_track_i].indexOf(note), 1);
 					}
 				}
 
@@ -100,7 +102,7 @@
 					return;
 
 				// check if the selected note is covering any other notes
-				for (const note of notes) {
+				for (const note of tracks[curr_track_i]) {
 
 					if (note == selected_note)
 						continue;
@@ -108,8 +110,9 @@
 					if (note.degree == selected_note.degree && (
 						   (note.beat                   >= selected_note.beat && note.beat                   < selected_note.beat + selected_note.length)
 						|| (note.beat + note.length - 1 >= selected_note.beat && note.beat + note.length - 1 < selected_note.beat + selected_note.length)
-					))
-						notes.splice(notes.indexOf(note), 1);
+					)) {
+						tracks[curr_track_i].splice(tracks[curr_track_i].indexOf(note), 1);
+					}
 				}
 
 				selected_note = null;
@@ -127,7 +130,7 @@
 
 				const relevant_notes = [];
 				
-				for (const note of notes) {
+				for (const note of tracks[curr_track_i]) {
 
 					if (note.beat <= cursor && note.beat + note.length > cursor)
 						relevant_notes.push(note);
@@ -165,7 +168,14 @@
 					if (cursor_move_t <= 0) {
 						
 						cursor_move_t = audioContext.sampleRate * 60 / bpm;
-						cursor = (cursor + 1) % beats_per_bar;
+						cursor += 1;
+
+						if (cursor >= beats_per_bar) {
+
+							cursor = 0;
+							curr_track_i = (curr_track_i + 1) % tracks.length;
+						}
+
 						rerender();
 					}
 				}
@@ -202,7 +212,7 @@
 			// return the existing note at that position, or create one if one doesn't exist
 			if (lookup_existing) {
 
-				for (const note of notes) {
+				for (const note of tracks[curr_track_i]) {
 
 					if (note.degree == degree && note.beat <= beat && note.beat + note.length > beat)
 						return note;
@@ -238,7 +248,7 @@
 			}
 
 			// render piano roll notes
-			for (const note of notes) {
+			for (const note of tracks[curr_track_i]) {
 
 				if (note == selected_note) {
 					render.fillStyle = "Yellow";
@@ -253,15 +263,15 @@
 
 		function try_set_bpm(value) {
 
-			if (!isNaN(value) && value >= 1 && value <= 300)
-				bpm = Math.floor(value) * 4;
+			if (!isNaN(value))
+				bpm = Math.max(1, Math.min(300, Math.floor(value))) * 4;
 
 			return "" + (bpm / 4);
 		}
 	</script>
 </head>
 <body style="margin: 0; background: black; color: #eee; font-family: sans-serif; font-weight: 700; font-size: 18px;">
-	<button id="start" style="position: absolute; left: 50%; top: 50%; font-size: 50px; transform: translate(-50%, -50%); font-family: monospace;" onclick="start();">Start</button>
+	<button type="button" id="start" style="position: absolute; left: 50%; top: 50%; font-size: 50px; transform: translate(-50%, -50%); font-family: monospace;" onclick="start();">Start</button>
 
 	<div style="display: flex;">
 
@@ -269,7 +279,23 @@
 	
 		<div>
 			<label for="bpm">BPM:</label>
-			<input type="text" name="bpm" onchange="value = try_set_bpm(value);" value="120">
+			<input type="text" name="bpm" onchange="value = try_set_bpm(value);" value="60">
+
+			<br><br>
+
+			<div style="display: flex; gap: 1em;">
+				<div style="display: flex; gap: 1em;">
+					<div style="background: grey; color: black; padding: 4px;">
+						<button type="button"><-</button>
+						1
+						<button type="button">-></button>
+						<br>
+						<button type="button">Edit</button>
+						<button type="button">Delete</button>
+					</div>
+				</div>
+				<button type="button">Add</button>
+			</div>
 		</div>
 	</div>
 </body>
