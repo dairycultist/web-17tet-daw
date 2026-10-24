@@ -28,6 +28,7 @@
 			document.getElementById("start").style.display = "none";
 			document.getElementById("content").style.display = "flex";
 			document.getElementById("bpm").value = bpm / 4;
+			document.getElementById("savecode").value = "";
 
 			const canvas = document.getElementById("canvas");
 			render = canvas.getContext("2d");
@@ -340,6 +341,20 @@
 
 			select_track(track_i + 1);
 		}
+
+		function copy_savecode() {
+			navigator.clipboard.writeText("test");
+
+			document.getElementById("copied_label").style.display = "inline";
+
+			setTimeout(() => {
+				document.getElementById("copied_label").style.display = "none";
+			}, 1000);
+		}
+
+		function try_set_savecode(value) {
+
+		}
 	</script>
 	<style>
 		.track {
@@ -364,7 +379,14 @@
 		<div>
 			<label for="bpm">BPM:</label>
 			<input type="text" name="bpm" id="bpm" onchange="value = try_set_bpm(value);" value="60">
+			<br><br>
 
+			<button type="button" onclick="copy_savecode();">Copy Savecode</button>
+			<span id="copied_label" style="display: none; color: greenyellow;">Copied!</span>
+			<br><br>
+
+			<label for="savecode">Paste savecode here (<span style="color: red;">will overwrite your project!</span>):</label>
+			<input type="text" name="savecode" id="savecode" onchange="value = try_set_savecode(value);">
 			<br><br>
 
 			<div style="display: flex; gap: 1em;">
