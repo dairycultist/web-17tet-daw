@@ -20,7 +20,7 @@
 		let selected_t = 0; // for playing audio upon selecting
 		let selected_note;
 
-		const tracks = [];
+		let tracks = [];
 		let curr_track_i = 0;
 
 		function start() {
@@ -351,7 +351,23 @@
 		}
 
 		function copy_savecode() {
-			navigator.clipboard.writeText("test");
+
+			// format (for now): <bpm>|<beats_per_bar>|<first track's notes>|<second>|...
+			let savecode = (bpm / 4) + "|" + beats_per_bar;
+
+			for (let i = 0; i < tracks.length; i++) {
+
+				savecode += "|";
+
+				if (tracks[i].length != 0) {
+
+					for (const note of tracks[i])
+						savecode += note.beat + "," + note.degree + "," + note.length + ",";
+					savecode = savecode.substring(0, savecode.length - 1);
+				}
+			}
+
+			navigator.clipboard.writeText(savecode);
 
 			document.getElementById("copied_label").style.display = "inline";
 
@@ -362,6 +378,37 @@
 
 		function try_set_savecode(value) {
 
+			const parts = value.split("|");
+
+			// basic sanity check so that it's hard to accidentally keymash a valid savecode and overwrite your entire project
+			if (parts.length < 3 || isNaN(parts[0]) || parts[0].trim().length == 0 || isNaN(parts[1]) || parts[1].trim().length == 0)
+				return "";
+
+			document.getElementById("bpm").value = try_set_bpm(parts[0]);
+			// TODO beats per bar
+
+			parts.splice(0, 2);
+
+			// delete all tracks
+			for (let i = 0; i < tracks.length; i++)
+				document.getElementById("track_" + i).remove();
+
+			// load tracks
+			tracks = [];
+			for (let i = 0; i < parts.length; i++) {
+
+				add_track();
+
+				const notes = parts[i].split(",");
+
+				for (let j = 0; j < notes.length; j += 3)
+					tracks[i].push({ beat: parseInt(notes[j]), degree: parseInt(notes[j + 1]), length: parseInt(notes[j + 2]) });
+			}
+
+			select_track(0);
+			rerender();
+
+			return value;
 		}
 	</script>
 	<style>
