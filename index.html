@@ -50,6 +50,14 @@
 						cursor_move_t = 0;
 						rerender();
 					}
+
+				} else if (event.key === "ArrowLeft") {
+
+					select_track((curr_track_i <= 0 ? tracks.length : curr_track_i) - 1);
+
+				} else if (event.key === "ArrowRight") {
+
+					select_track(curr_track_i >= tracks.length - 1 ? 0 : curr_track_i + 1);
 				}
 			});
 
