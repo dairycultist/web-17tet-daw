@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>17-TET DAW</title>
+	<script>
+
+		let t = 0;
+		let base_octave = 7;
+
+		let root_note = 0;
+		let interval = 10;
+		let note_state = 0; // 0 for playing root note, 1 for playing interval above root, 2 for no playing
+
+		function start() {
+
+			document.getElementById("start").style.display = "none";
+			document.getElementById("content").style.display = "block";
+
+			const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+			const scriptProcessor = audioContext.createScriptProcessor(256, 1, 1); // generates audio data with 256 samples
+
+			scriptProcessor.connect(audioContext.destination); // connect to speaker
+
+			scriptProcessor.onaudioprocess = (event) => {
+
+				let note;
+
+				switch (note_state) {
+					case 0: note = root_note; break;
+					case 1: note = root_note + interval; break;
+					default: return;
+				}
+
+				const output = event.outputBuffer.getChannelData(0);
+
+				for (let i = 0; i < output.length; i++) {
+
+					const signal = Math.sign(Math.sin(Math.pow(2.0, (note + base_octave * 17) / 17.0) * 2.0 * Math.PI * (t + i) / audioContext.sampleRate));
+					let amplitude = 0.3;
+
+					output[i] = signal * amplitude;
+				}
+
+				t += output.length;
+
+				if (t > 30000) {
+					note_state++;
+					t = 0;
+				}
+			};
+		}
+	</script>
+</head>
+<body style="margin: 0; font-family: sans-serif; font-size: 18px;">
+
+	<button type="button" id="start" style="position: absolute; left: 50%; top: 50%; font-size: 50px; transform: translate(-50%, -50%); font-family: monospace;" onclick="start();">Start</button>
+
+	<div style="display: none;" id="content">
+
+		apple
+	</div>
+
+</body>
+</html>
