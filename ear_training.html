@@ -62,7 +62,9 @@
 
 			root_note = Math.floor(Math.random() * 35);
 			interval = Math.floor(Math.random() * 18);
+			
 			note_state = 0;
+			t = 0;
 		}
 	</script>
 	<style>
@@ -107,7 +109,7 @@
 			<button type="button" onclick="selectAnswer(17);">octave</button>
 		</div>
 		<br>
-		<button type="button" style="width: 100%;" onclick="note_state = 0;">Play again</button>
+		<button type="button" style="width: 100%;" onclick="note_state = 0; t = 0;">Play again</button>
 	</div>
 
 </body>
