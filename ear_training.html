@@ -4,6 +4,8 @@
 	<meta charset="UTF-8">
 	<title>17-TET DAW</title>
 	<script>
+		
+		const interval_names = [ "unison", "minor 2nd", "neutral 2nd", "major 2nd", "minor 3rd", "neutral 3rd", "major 3rd", "perfect 4th", "diminished 5th", "augmented 4th", "perfect 5th", "minor 6th", "neutral 6th", "major 6th", "minor 7th", "neutral 7th", "major 7th", "octave" ];
 
 		let t = 0;
 		let base_octave = 7;
@@ -53,7 +55,14 @@
 
 		function selectAnswer(answer) {
 
-			alert("WRONG! " + answer);
+			if (answer != interval) {
+
+				alert("WRONG! It was " + interval_names[interval]);
+			}
+
+			root_note = Math.floor(Math.random() * 35);
+			interval = Math.floor(Math.random() * 18);
+			note_state = 0;
 		}
 	</script>
 	<style>
@@ -67,7 +76,7 @@
 	<div style="display: none; margin: auto; width: 50em;" id="content">
 		<br>
 		<div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr;">
-			<button type="button" onclick="selectAnswer(0);">Unison</button>
+			<button type="button" onclick="selectAnswer(0);">unison</button>
 			<div></div>
 			<button type="button" onclick="selectAnswer(7);">perfect 4th</button>
 			<div></div>
@@ -95,10 +104,10 @@
 			<div></div>
 			<button type="button" onclick="selectAnswer(10);">perfect 5th</button>
 			<div></div>
-			<button type="button" onclick="selectAnswer(17);">Octave</button>
+			<button type="button" onclick="selectAnswer(17);">octave</button>
 		</div>
 		<br>
-		<button type="button" style="width: 100%;">Play again</button>
+		<button type="button" style="width: 100%;" onclick="note_state = 0;">Play again</button>
 	</div>
 
 </body>
