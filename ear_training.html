@@ -34,12 +34,14 @@
 					default: return;
 				}
 
+				note = Math.pow(2.0, (note + base_octave * 17) / 17.0) * 2.0 * Math.PI / audioContext.sampleRate;
+
 				const output = event.outputBuffer.getChannelData(0);
 
 				for (let i = 0; i < output.length; i++) {
 
-					const signal = Math.sign(Math.sin(Math.pow(2.0, (note + base_octave * 17) / 17.0) * 2.0 * Math.PI * (t + i) / audioContext.sampleRate));
-					let amplitude = 0.3;
+					const signal = Math.sign(Math.sin(note * (t + i)));
+					let amplitude = Math.max(0.0, 1.0 - (t / 30000)) * 0.3;
 
 					output[i] = signal * amplitude;
 				}
@@ -55,10 +57,8 @@
 
 		function selectAnswer(answer) {
 
-			if (answer != interval) {
-
+			if (answer != interval)
 				alert("WRONG! It was " + interval_names[interval]);
-			}
 
 			root_note = Math.floor(Math.random() * 35);
 			interval = Math.floor(Math.random() * 18);
