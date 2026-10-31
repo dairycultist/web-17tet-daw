@@ -50,6 +50,11 @@
 				}
 			};
 		}
+
+		function selectAnswer(answer) {
+
+			alert("WRONG! " + answer);
+		}
 	</script>
 	<style>
 		button { padding: 1em; font: inherit; }
@@ -59,48 +64,41 @@
 
 	<button type="button" id="start" style="position: absolute; left: 50%; top: 50%; font-size: 50px; transform: translate(-50%, -50%); font-family: monospace;" onclick="start();">Start</button>
 
-	<div style="display: none;" id="content">
-
-		<div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;">
-			<button type="button">Unison</button>
+	<div style="display: none; margin: auto; width: 50em;" id="content">
+		<br>
+		<div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr;">
+			<button type="button" onclick="selectAnswer(0);">Unison</button>
 			<div></div>
-			<div></div>
-			<button type="button">perfect 4th</button>
-			<div></div>
+			<button type="button" onclick="selectAnswer(7);">perfect 4th</button>
 			<div></div>
 			<div></div>
 
+			<button type="button" onclick="selectAnswer(1);">minor 2nd</button>
+			<button type="button" onclick="selectAnswer(4);">minor 3rd</button>
+			<button type="button" onclick="selectAnswer(8);">diminished 5th</button>
+			<button type="button" onclick="selectAnswer(11);">minor 6th</button>
+			<button type="button" onclick="selectAnswer(14);">minor 7th</button>
+
+			<button type="button" onclick="selectAnswer(2);">neutral 2nd</button>
+			<button type="button" onclick="selectAnswer(5);">neutral 3rd</button>
+			<div></div>
+			<button type="button" onclick="selectAnswer(12);">neutral 6th</button>
+			<button type="button" onclick="selectAnswer(15);">neutral 7th</button>
+
+			<button type="button" onclick="selectAnswer(3);">major 2nd</button>
+			<button type="button" onclick="selectAnswer(6);">major 3rd</button>
+			<button type="button" onclick="selectAnswer(9);">augmented 4th</button>
+			<button type="button" onclick="selectAnswer(13);">major 6th</button>
+			<button type="button" onclick="selectAnswer(16);">major 7th</button>
 			
 			<div></div>
-			<button type="button">minor 2nd</button>
-			<button type="button">minor 3rd</button>
-			<button type="button">diminished 5th</button>
 			<div></div>
-			<button type="button">minor 6th</button>
-			<button type="button">minor 7th</button>
-
+			<button type="button" onclick="selectAnswer(10);">perfect 5th</button>
 			<div></div>
-			<button type="button">neutral 2nd</button>
-			<button type="button">neutral 3rd</button>
-			<div></div>
-			<div></div>
-			<button type="button">neutral 6th</button>
-			<button type="button">neutral 7th</button>
-
-			<div></div>
-			<button type="button">major 2nd</button>
-			<button type="button">major 3rd</button>
-			<div></div>
-			<button type="button">augmented 4th</button>
-			<button type="button">major 6th</button>
-			<button type="button">major 7th</button>
-			
-			<button type="button">Octave</button>
-			<div></div>
-			<div></div>
-			<div></div>
-			<button type="button">perfect 5th</button>
+			<button type="button" onclick="selectAnswer(17);">Octave</button>
 		</div>
+		<br>
+		<button type="button" style="width: 100%;">Play again</button>
 	</div>
 
 </body>
